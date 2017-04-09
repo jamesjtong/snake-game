@@ -18,7 +18,8 @@ const gameState = {
   direction: 'right',
   score: 0,
   food: null,
-  snake: null
+  snake: null,
+  paused: false
 };
 
 export default function initializeGame() {
@@ -28,9 +29,32 @@ export default function initializeGame() {
   gameState.food = new Food(gameSettings);
   gameState.canvasContext = createSnakeCanvas();
 
-  const paintInterval = setInterval(() => {
+  let paintInterval = setInterval(() => {
     gameLoop(gameState)
   }, 100);
+
+
+  document.getElementById('pause-button').addEventListener('click', event => {
+    clearInterval(paintInterval);
+    gameState.paused = true;
+  })
+
+  document.addEventListener('keydown', ({ key }) => {
+    if (key === " ") {
+      if (gameState.paused === false) {
+        clearInterval(paintInterval);
+        gameState.paused = true;
+      } else {
+        paintInterval = setInterval(() => gameLoop(gameState), 100);
+        gameState.paused = false;
+      }
+    }
+  })
+
+  document.getElementById('play-button').addEventListener('click', event => {
+    paintInterval = setInterval(() => gameLoop(gameState), 100);
+    gameState.paused = false;
+  })
 }
 
 function createSnakeCanvas() {

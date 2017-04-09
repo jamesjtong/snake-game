@@ -15,7 +15,9 @@ export default class Snake {
     this.length += food.length
   }
 
-  move({ direction, food: {} }) {
+  move(globalsObject) {
+    let { direction, food } = globalsObject;
+
     this.body.shift();
     const oldHead = this.body[this.body.length-1];
     const newHead = Object.assign({}, oldHead)
@@ -30,6 +32,8 @@ export default class Snake {
       newHead.yCoordinate++;
     }
     this.body.push(newHead);
+
+
   }
 
   get head() {

@@ -1,5 +1,5 @@
 export default class Food {
-  constructor(xMax, yMax, cellWidth) {
+  constructor({ width: xMax, height: yMax, cellWidth }) {
     this.xCoordinate = Math.round(Math.random() * (xMax-cellWidth)/cellWidth);
     this.yCoordinate = Math.round(Math.random() * (yMax-cellWidth)/cellWidth);
 

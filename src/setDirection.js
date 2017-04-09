@@ -1,5 +1,4 @@
 export default function setDirection({key}, globalsObject) {
-  console.log('key', key);
   let newDirection = keyMap[key]
   if (validNewDirection(newDirection, globalsObject.direction)) {
     globalsObject.direction = newDirection;

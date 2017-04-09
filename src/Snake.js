@@ -1,5 +1,5 @@
 export default class Snake {
-  constructor(length = 20) {
+  constructor(length = 5) {
     this.length = length;
     this.body = [];
 
@@ -11,29 +11,48 @@ export default class Snake {
     }
   }
 
-  eat(food) {
-    this.length += food.length
+  eat() {
+    this.length++
   }
 
-  move(globalsObject) {
+  move(globalsObject, successFn) {
     let { direction, food } = globalsObject;
 
-    this.body.shift();
-    const oldHead = this.body[this.body.length-1];
+
+    const oldHead = this.head;
     const newHead = Object.assign({}, oldHead)
 
     if (direction == 'right') {
       newHead.xCoordinate++;
-    } else if(direction == 'left') {
+    } else if(direction === 'left') {
       newHead.xCoordinate--;
-    } else if(direction == 'up') {
+    } else if(direction === 'up') {
       newHead.yCoordinate--;
-    } else if(direction == 'down') {
+    } else if(direction === 'down') {
       newHead.yCoordinate++;
     }
-    this.body.push(newHead);
+    
 
+    if (newHead.xCoordinate === food.xCoordinate && newHead.yCoordinate === food.yCoordinate) {
+      let oldTail = this.body[0];
+      let newTail = Object.assign({}, oldTail)
 
+      if (direction == 'right') {
+        newTail.xCoordinate--;
+      } else if(direction == 'left') {
+        newTail.xCoordinate++;
+      } else if(direction == 'up') {
+        newTail.yCoordinate++;
+      } else if(direction == 'down') {
+        newTail.yCoordinate--;
+      }
+      this.body.unshift(newTail);
+      successFn();
+
+    } else {
+      this.body.shift();
+      this.body.push(newHead);
+    }
   }
 
   get head() {
@@ -41,6 +60,6 @@ export default class Snake {
   }
 
   getHead() {
-    return this.body[this.length - 1];
+    return this.body[this.body.length - 1];
   }
 }

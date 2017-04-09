@@ -42,13 +42,7 @@ function paintCanvas({ snake, food }, canvasContext) {
   canvasContext.fillStyle = 'orange';
   canvasContext.fillRect(0, 0, gameSettings.width, gameSettings.height);
 
-
-  let collision = checkCollision(snake, gameSettings)
-
-  if (collision) {
-    resetGame(globalsObject);
-  }
-
+  paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
 
   const snakeBody = snake.body;
   for (let i = 0; i < snakeBody.length; i++) {
@@ -56,9 +50,18 @@ function paintCanvas({ snake, food }, canvasContext) {
     paintCell(canvasContext, cell.xCoordinate, cell.yCoordinate, 'purple');
   }
 
-  paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
+  snake.move(globalsObject, successFn);
 
-  snake.move(globalsObject);
+  let collision = checkCollision(snake, gameSettings)
+
+  if (collision) {
+    resetGame(globalsObject);
+  }
+}
+
+function successFn() {
+  globalsObject.score++;
+    globalsObject.food = new Food(gameSettings);
 }
 
 function resetGame(globalsObject) {

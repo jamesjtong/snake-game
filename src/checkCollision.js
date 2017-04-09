@@ -12,6 +12,7 @@ function outOfBounds({ xCoordinate, yCoordinate }, { width, height, cellWidth })
   }
 }
 
+let i = 0;
 function hittingItself(snake) {
   const bodyWithoutHead = snake.body.slice(0,-1)
   const snakeHead = snake.head;

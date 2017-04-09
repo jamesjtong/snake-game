@@ -1,7 +1,7 @@
-export default function setDirection({key}, globalsObject) {
+export default function setDirection({key}, gameState) {
   let newDirection = keyMap[key]
-  if (validNewDirection(newDirection, globalsObject.direction)) {
-    globalsObject.direction = newDirection;
+  if (validNewDirection(newDirection, gameState.direction)) {
+    gameState.direction = newDirection;
   }
 }
 

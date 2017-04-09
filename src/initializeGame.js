@@ -2,6 +2,7 @@ import Snake from './Snake';
 import Food from './Food';
 import setDirection from './setDirection';
 import checkCollision from './checkCollision';
+import paintCell from './paintCell';
 
 const gameSettings = {
   width: document.getElementById('snake-game').width,
@@ -10,9 +11,10 @@ const gameSettings = {
 };
 
 const scoreMultiple = 50;
+const squareSpaceBlack = '#121212';
 
 // used to pass changeable state around
-let globalsObject = {
+const gameState = {
   direction: 'right',
   score: 0,
   food: null,
@@ -20,13 +22,14 @@ let globalsObject = {
 };
 
 export default function initializeGame() {
-  let canvasContext = createSnakeCanvas();
+  document.addEventListener('keydown', event => setDirection(event, gameState));
 
-  globalsObject.snake = new Snake();
-  globalsObject.food = new Food(gameSettings);
+  gameState.snake = new Snake();
+  gameState.food = new Food(gameSettings);
+  gameState.canvasContext = createSnakeCanvas();
 
-  let paintInterval = setInterval(() => {
-    paintCanvas(globalsObject, canvasContext)
+  const paintInterval = setInterval(() => {
+    gameLoop(gameState)
   }, 100);
 }
 
@@ -37,51 +40,44 @@ function createSnakeCanvas() {
   return canvasContext;
 }
 
-function paintCanvas({ snake, food }, canvasContext) {
-  // need to paint to avoid snake trail
-  canvasContext.fillStyle = 'orange';
+function gameLoop(gameState) {
+  const { snake, food, canvasContext } = gameState;
+
+  // need to repaint over snake trail
+  canvasContext.fillStyle = squareSpaceBlack;
   canvasContext.fillRect(0, 0, gameSettings.width, gameSettings.height);
 
-  paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
+  paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey', gameSettings);
 
   const snakeBody = snake.body;
   for (let i = 0; i < snakeBody.length; i++) {
     const cell = snakeBody[i];
-    paintCell(canvasContext, cell.xCoordinate, cell.yCoordinate, 'purple');
+    paintCell(canvasContext, cell.xCoordinate, cell.yCoordinate, 'white', gameSettings);
   }
 
-  snake.move(globalsObject, successFn);
+  snake.move(gameState, successFn);
 
-  let collision = checkCollision(snake, gameSettings)
+  const collision = checkCollision(snake, gameSettings)
 
   if (collision) {
-    resetGame(globalsObject);
+    resetGame(gameState);
   }
+  updateScore(gameState);
 }
 
-function successFn() {
-  globalsObject.score++;
-    globalsObject.food = new Food(gameSettings);
+function successFn(gameState) {
+  gameState.score++;
+  gameState.food = new Food(gameSettings);
 }
 
-function resetGame(globalsObject) {
-  globalsObject.direction = 'right';
-  globalsObject.score = 0;
-  globalsObject.snake = new Snake();
-  globalsObject.food = new Food(gameSettings);
+function updateScore({ score, canvasContext }) {
+  const { width, height, cellWidth } = gameSettings;
+  canvasContext.fillText(`SCORE ${score*scoreMultiple}`, width - 100, 50 )
 }
 
-
-// belongs in own file
-function paintCell(canvasContext, xCoordinate, yCoordinate, color) {
-  canvasContext.fillStyle = color;
-  canvasContext.fillRect(xCoordinate*gameSettings.cellWidth,
-    yCoordinate*gameSettings.cellWidth,
-    gameSettings.cellWidth,
-    gameSettings.cellWidth
-  );
+function resetGame(gameState) {
+  gameState.direction = 'right';
+  gameState.score = 0;
+  gameState.snake = new Snake();
+  gameState.food = new Food(gameSettings);
 }
-
-document.addEventListener('keydown', (event) => {
-  setDirection(event, globalsObject)
-});

@@ -1,5 +1,5 @@
 export default class Snake {
-  constructor(length = 4) {
+  constructor(length = 20) {
     this.length = length;
     this.body = [];
 
@@ -11,11 +11,11 @@ export default class Snake {
     }
   }
 
-  eatFood(food) {
+  eat(food) {
     this.length += food.length
   }
 
-  shiftBody(direction) {
+  move(direction) {
     this.body.shift();
     const oldHead = this.body[this.body.length-1];
     const newHead = Object.assign({}, oldHead)
@@ -24,15 +24,19 @@ export default class Snake {
       newHead.xCoordinate++;
     } else if(direction == 'left') {
       newHead.xCoordinate--;
-    //   newX--;
     } else if(direction == 'up') {
-    //   newY--;
       newHead.yCoordinate--;
     } else if(direction == 'down') {
       newHead.yCoordinate++;
-    //   newY++;
     }
     this.body.push(newHead);
+  }
 
+  get head() {
+    return this.getHead();
+  }
+
+  getHead() {
+    return this.body[this.length - 1];
   }
 }

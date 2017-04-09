@@ -13,7 +13,6 @@ let score = 0;
 export default function initializeGame() {
   let canvasContext = createSnakeCanvas();
 
-
   let snake = new Snake();
   let food = new Food(width, height, cellWidth);
 
@@ -26,11 +25,6 @@ function createSnakeCanvas() {
   const canvas = document.getElementById('snake-game');
   const canvasContext = canvas.getContext('2d');
 
-  // canvasContext.fillStyle = 'orange';
-  // canvasContext.fillRect(0, 0, width, height);
-  // canvasContext.strokeStyle = 'black';
-  // canvasContext.strokeRect(0, 0, width, height);
-
   return canvasContext;
 }
 
@@ -38,51 +32,50 @@ function paintCanvas(snake, food, canvasContext) {
   // need to paint to avoid snake trail
   canvasContext.fillStyle = 'orange';
   canvasContext.fillRect(0, 0, width, height);
-  
+
+  snake.move(direction);
+
+  let collision = checkCollision(snake)
+
 
   const snakeBody = snake.body;
-
-  // console.log('snakeBody', snakeBody);
-  // let newX = snakeBody[0].xCoordinate;
-  // let newY = snakeBody[0].yCoordinate;
-
-  snakeBody.shift();
-  const oldHead = snakeBody[snakeBody.length-1];
-  const newHead = Object.assign({}, oldHead)
-
-  if (direction == 'right') {
-    newHead.xCoordinate++;
-  } else if(direction == 'left') {
-    newHead.xCoordinate--;
-  //   newX--;
-  } else if(direction == 'up') {
-  //   newY--;
-    newHead.yCoordinate--;
-  } else if(direction == 'down') {
-    newHead.yCoordinate++;
-  //   newY++;
-  }
-  snakeBody.push(newHead);
-
-  // snake.shiftBody(direction);
-  // check for collision
-  //
-
-  // paint cell
-  //
-
   for (let i = 0; i < snakeBody.length; i++) {
     const cell = snakeBody[i];
     paintCell(canvasContext, cell.xCoordinate, cell.yCoordinate, 'purple');
   }
 
-  // debugger
-  // paintFood (make sure snake isn't in it)
   paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
 }
 
-function checkForCollision() {
+function checkCollision(snake) {
+  console.log('out of bounds', outOfBounds(snake.head));
+  console.log('hitting itself', hittingItself(snake));
 
+  return outOfBounds(snake.head) && hittingItself(snake)
+}
+
+function outOfBounds({ xCoordinate, yCoordinate }) {
+  console.log(xCoordinate)
+  if (xCoordinate < -1 || (xCoordinate >= (width/cellWidth - 1))) {
+    return true;
+  } else if (yCoordinate < -1 || (yCoordinate >= (height/cellWidth - 1))) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function hittingItself(snake) {
+  const bodyWithoutHead = snake.body.slice(0,-1)
+  const snakeHead = snake.head;
+
+  for (let cell of bodyWithoutHead) {
+    if (cell.xCoordinate === snakeHead.xCoordinate && cell.yCoordinate === snakeHead.yCoordinate) {
+      return true
+    }
+  }
+
+  return false;
 }
 
 // belongs in own file
@@ -119,7 +112,7 @@ const opposingDirectionMap = {
 };
 
 function setDirection({key}) {
-  // console.log('key', key);
+  console.log('key', key);
   let newDirection = keyMap[key]
   if (validNewDirection(newDirection)) {
     direction = newDirection;

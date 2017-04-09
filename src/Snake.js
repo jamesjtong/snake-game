@@ -16,10 +16,23 @@ export default class Snake {
   }
 
   shiftBody(direction) {
-    for (let cell of this.body) {
-      if (direction === 'right') {
-        cell.xCoordinate++
-      }
+    this.body.shift();
+    const oldHead = this.body[this.body.length-1];
+    const newHead = Object.assign({}, oldHead)
+
+    if (direction == 'right') {
+      newHead.xCoordinate++;
+    } else if(direction == 'left') {
+      newHead.xCoordinate--;
+    //   newX--;
+    } else if(direction == 'up') {
+    //   newY--;
+      newHead.yCoordinate--;
+    } else if(direction == 'down') {
+      newHead.yCoordinate++;
+    //   newY++;
     }
+    this.body.push(newHead);
+
   }
 }

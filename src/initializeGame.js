@@ -19,7 +19,7 @@ export default function initializeGame() {
 
   let paintInterval = setInterval(() => {
     paintCanvas(snake, food, canvasContext)
-  }, 50);
+  }, 100);
 }
 
 function createSnakeCanvas() {
@@ -36,27 +36,35 @@ function createSnakeCanvas() {
 
 function paintCanvas(snake, food, canvasContext) {
   // need to paint to avoid snake trail
-  canvasContext.fillStyle = "orange";
+  canvasContext.fillStyle = 'orange';
   canvasContext.fillRect(0, 0, width, height);
   
 
-  let snakeBody = snake.body;
+  const snakeBody = snake.body;
 
   // console.log('snakeBody', snakeBody);
   // let newX = snakeBody[0].xCoordinate;
   // let newY = snakeBody[0].yCoordinate;
 
-  // if (direction == 'right') {
-  //   snakeBody[0].xCoordinate++
-  // } else if(direction == 'left') {
-  //   newX--;
-  // } else if(direction == 'up') {
-  //   newY--;
-  // } else if(direction == 'down') {
-  //   newY++;
-  // }
+  snakeBody.shift();
+  const oldHead = snakeBody[snakeBody.length-1];
+  const newHead = Object.assign({}, oldHead)
 
-  snake.shiftBody(direction);
+  if (direction == 'right') {
+    newHead.xCoordinate++;
+  } else if(direction == 'left') {
+    newHead.xCoordinate--;
+  //   newX--;
+  } else if(direction == 'up') {
+  //   newY--;
+    newHead.yCoordinate--;
+  } else if(direction == 'down') {
+    newHead.yCoordinate++;
+  //   newY++;
+  }
+  snakeBody.push(newHead);
+
+  // snake.shiftBody(direction);
   // check for collision
   //
 
@@ -64,14 +72,12 @@ function paintCanvas(snake, food, canvasContext) {
   //
 
   for (let i = 0; i < snakeBody.length; i++) {
-    let cell = snakeBody[i];
-    //Lets paint 10px wide cells
+    const cell = snakeBody[i];
     paintCell(canvasContext, cell.xCoordinate, cell.yCoordinate, 'purple');
   }
 
   // debugger
   // paintFood (make sure snake isn't in it)
-  console.log('adding food');
   paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
 }
 
@@ -84,7 +90,43 @@ function paintCell(canvasContext, xCoordinate, yCoordinate, color) {
   canvasContext.fillStyle = color;
   canvasContext.fillRect(xCoordinate*cellWidth,
     yCoordinate*cellWidth,
-    cellWidth
+    cellWidth,
     cellWidth
   );
+}
+
+document.addEventListener('keydown', setDirection);
+
+// belongs in own file
+const keyMap = {
+  'ArrowDown': 'down',
+  'ArrowUp': 'up',
+  'ArrowRight': 'right',
+  'ArrowLeft': 'left',
+
+  // VimStyle
+  'j': 'down',
+  'k': 'up',
+  'l': 'right',
+  'h': 'left'
+};
+
+const opposingDirectionMap = {
+  'right': 'left',
+  'left': 'right',
+  'up': 'down',
+  'down': 'up'
+};
+
+function setDirection({key}) {
+  // console.log('key', key);
+  let newDirection = keyMap[key]
+  if (validNewDirection(newDirection)) {
+    direction = newDirection;
+    console.log('setting new direction', direction)
+  }
+}
+
+function validNewDirection(newDirection) {
+  return newDirection && (opposingDirectionMap[newDirection] !== direction);
 }

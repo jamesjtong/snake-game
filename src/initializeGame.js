@@ -11,17 +11,19 @@ const scoreMultiple = 50;
 // used to pass state around
 let globalsObject = {
   direction: 'right',
-  score: 0
+  score: 0,
+  food: null,
+  snake: null
 };
 
 export default function initializeGame() {
   let canvasContext = createSnakeCanvas();
 
-  let snake = new Snake();
-  let food = new Food(width, height, cellWidth);
+  globalsObject.snake = new Snake();
+  globalsObject.food = new Food(width, height, cellWidth);
 
   let paintInterval = setInterval(() => {
-    paintCanvas(snake, food, canvasContext)
+    paintCanvas(globalsObject, canvasContext)
   }, 100);
 }
 
@@ -32,14 +34,19 @@ function createSnakeCanvas() {
   return canvasContext;
 }
 
-function paintCanvas(snake, food, canvasContext) {
+function paintCanvas({ snake, food }, canvasContext) {
   // need to paint to avoid snake trail
   canvasContext.fillStyle = 'orange';
   canvasContext.fillRect(0, 0, width, height);
 
-  snake.move(globalsObject.direction);
 
   let collision = checkCollision(snake)
+
+  console.log('collision val', collision);
+  if (collision) {
+    console.log('collision')
+    resetGame(globalsObject);
+  }
 
 
   const snakeBody = snake.body;
@@ -49,13 +56,24 @@ function paintCanvas(snake, food, canvasContext) {
   }
 
   paintCell(canvasContext, food.xCoordinate, food.yCoordinate, 'grey');
+
+  snake.move(globalsObject);
+}
+
+function resetGame(globalsObject) {
+  console.log('resetting game');
+  globalsObject.direction = 'right';
+  globalsObject.score = 0;
+  globalsObject.snake = new Snake();
+  globalsObject.food = new Food();
+
 }
 
 function checkCollision(snake) {
   console.log('out of bounds', outOfBounds(snake.head));
   console.log('hitting itself', hittingItself(snake));
 
-  return outOfBounds(snake.head) && hittingItself(snake)
+  return outOfBounds(snake.head) || hittingItself(snake)
 }
 
 function outOfBounds({ xCoordinate, yCoordinate }) {
@@ -96,5 +114,3 @@ function paintCell(canvasContext, xCoordinate, yCoordinate, color) {
 document.addEventListener('keydown', (event) => {
   setDirection(event, globalsObject)
 });
-
-// belongs in own file

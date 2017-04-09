@@ -15,7 +15,7 @@ export default class Snake {
     this.length += food.length
   }
 
-  move(direction) {
+  move({ direction, food: {} }) {
     this.body.shift();
     const oldHead = this.body[this.body.length-1];
     const newHead = Object.assign({}, oldHead)

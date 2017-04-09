@@ -1,5 +1,6 @@
 import Snake from './Snake'
 import Food from './Food'
+import setDirection from './setDirection'
 
 const width = document.getElementById('snake-game').width;
 const height = document.getElementById('snake-game').height;
@@ -7,8 +8,11 @@ const cellWidth = 10;
 
 const scoreMultiple = 50;
 
-let direction = 'right';
-let score = 0;
+// used to pass state around
+let globalsObject = {
+  direction: 'right',
+  score: 0
+};
 
 export default function initializeGame() {
   let canvasContext = createSnakeCanvas();
@@ -33,7 +37,7 @@ function paintCanvas(snake, food, canvasContext) {
   canvasContext.fillStyle = 'orange';
   canvasContext.fillRect(0, 0, width, height);
 
-  snake.move(direction);
+  snake.move(globalsObject.direction);
 
   let collision = checkCollision(snake)
 
@@ -70,7 +74,8 @@ function hittingItself(snake) {
   const snakeHead = snake.head;
 
   for (let cell of bodyWithoutHead) {
-    if (cell.xCoordinate === snakeHead.xCoordinate && cell.yCoordinate === snakeHead.yCoordinate) {
+    if (cell.xCoordinate === snakeHead.xCoordinate &&
+        cell.yCoordinate === snakeHead.yCoordinate) {
       return true
     }
   }
@@ -88,38 +93,8 @@ function paintCell(canvasContext, xCoordinate, yCoordinate, color) {
   );
 }
 
-document.addEventListener('keydown', setDirection);
+document.addEventListener('keydown', (event) => {
+  setDirection(event, globalsObject)
+});
 
 // belongs in own file
-const keyMap = {
-  'ArrowDown': 'down',
-  'ArrowUp': 'up',
-  'ArrowRight': 'right',
-  'ArrowLeft': 'left',
-
-  // VimStyle
-  'j': 'down',
-  'k': 'up',
-  'l': 'right',
-  'h': 'left'
-};
-
-const opposingDirectionMap = {
-  'right': 'left',
-  'left': 'right',
-  'up': 'down',
-  'down': 'up'
-};
-
-function setDirection({key}) {
-  console.log('key', key);
-  let newDirection = keyMap[key]
-  if (validNewDirection(newDirection)) {
-    direction = newDirection;
-    console.log('setting new direction', direction)
-  }
-}
-
-function validNewDirection(newDirection) {
-  return newDirection && (opposingDirectionMap[newDirection] !== direction);
-}

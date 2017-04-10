@@ -3,6 +3,7 @@ import Food from './Food';
 import setDirection from './setDirection';
 import checkCollision from './checkCollision';
 import paintCell from './paintCell';
+import createSnakeCanvas from './createSnakeCanvas';
 
 const gameSettings = {
   width: document.getElementById('snake-game').width,
@@ -21,16 +22,17 @@ const gameState = {
   snake: null,
   intervalId: null,
   paused: false,
-  speed: 4
+  speed: 7
 };
 
 export default function initializeGame() {
   gameState.snake = new Snake();
   gameState.food = new Food(gameSettings);
   gameState.canvasContext = createSnakeCanvas();
-
-  gameState.intervalId = window.setInterval(startGameLoop, gameState.speed * 20);
   addUserInteractivity(gameState);
+
+  // START GAME HERE
+  gameState.intervalId = window.setInterval(startGameLoop, gameState.speed * 20);
 }
 
 function startGameLoop() {
@@ -81,13 +83,6 @@ function resetGame(gameState) {
   gameState.food = new Food(gameSettings);
 }
 
-function createSnakeCanvas() {
-  const canvas = document.getElementById('snake-game');
-  const canvasContext = canvas.getContext('2d');
-
-  return canvasContext;
-}
-
 function addUserInteractivity(gameState) {
   document.addEventListener('keydown', event => setDirection(event, gameState));
   document.getElementById('pause-button').addEventListener('click', event => {
@@ -113,4 +108,3 @@ function addUserInteractivity(gameState) {
     gameState.intervalid = window.setInterval(startGameLoop, gameState.speed * 20);
   });
 }
-

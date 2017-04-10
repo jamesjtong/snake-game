@@ -15,9 +15,8 @@ export default class Snake {
     const { direction, food } = gameState;
 
     const oldHead = this.head;
-    const newHead = Object.assign({}, oldHead)
 
-    if (newHead.xCoordinate === food.xCoordinate && newHead.yCoordinate === food.yCoordinate) {
+    if (oldHead.xCoordinate === food.xCoordinate && oldHead.yCoordinate === food.yCoordinate) {
       const oldTail = this.body[0];
       const newTail = Object.assign({}, oldTail)
 
@@ -34,6 +33,7 @@ export default class Snake {
       successFn(gameState);
 
     } else {
+      const newHead = Object.assign({}, oldHead)
 
       if (direction == 'right') {
         newHead.xCoordinate++;

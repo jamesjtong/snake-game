@@ -19,49 +19,24 @@ const gameState = {
   score: 0,
   food: null,
   snake: null,
-  paused: false
+  intervalId: null,
+  paused: false,
+  speed: 4
 };
 
 export default function initializeGame() {
-  document.addEventListener('keydown', event => setDirection(event, gameState));
-
   gameState.snake = new Snake();
   gameState.food = new Food(gameSettings);
   gameState.canvasContext = createSnakeCanvas();
 
-  let paintInterval = setInterval(() => {
-    gameLoop(gameState)
-  }, 100);
-
-
-  document.getElementById('pause-button').addEventListener('click', event => {
-    clearInterval(paintInterval);
-    gameState.paused = true;
-  })
-
-  document.addEventListener('keydown', ({ key }) => {
-    if (key === " ") {
-      if (gameState.paused === false) {
-        clearInterval(paintInterval);
-        gameState.paused = true;
-      } else {
-        paintInterval = setInterval(() => gameLoop(gameState), 100);
-        gameState.paused = false;
-      }
-    }
-  })
-
-  document.getElementById('play-button').addEventListener('click', event => {
-    paintInterval = setInterval(() => gameLoop(gameState), 100);
-    gameState.paused = false;
-  })
+  gameState.intervalId = window.setInterval(startGameLoop, gameState.speed * 20);
+  addUserInteractivity(gameState);
 }
 
-function createSnakeCanvas() {
-  const canvas = document.getElementById('snake-game');
-  const canvasContext = canvas.getContext('2d');
-
-  return canvasContext;
+function startGameLoop() {
+  if (!gameState.paused) {
+    gameLoop(gameState)
+  }
 }
 
 function gameLoop(gameState) {
@@ -105,3 +80,37 @@ function resetGame(gameState) {
   gameState.snake = new Snake();
   gameState.food = new Food(gameSettings);
 }
+
+function createSnakeCanvas() {
+  const canvas = document.getElementById('snake-game');
+  const canvasContext = canvas.getContext('2d');
+
+  return canvasContext;
+}
+
+function addUserInteractivity(gameState) {
+  document.addEventListener('keydown', event => setDirection(event, gameState));
+  document.getElementById('pause-button').addEventListener('click', event => {
+    gameState.paused = true;
+  });
+  document.addEventListener('keydown', ({ key }) => {
+    if (key === " ") {
+      gameState.paused = !gameState.paused;
+    }
+  });
+  document.getElementById('play-button').addEventListener('click', event => {
+    gameState.paused = false;
+  });
+  document.getElementById('speed-up-button').addEventListener('click', event => {
+    window.clearInterval(gameState.intervalId);
+    gameState.speed--;
+    gameState.intervalId = window.setInterval(startGameLoop, gameState.speed * 20);
+  });
+
+  document.getElementById('slow-down-button').addEventListener('click', event => {
+    window.clearInterval(gameState.intervalId);
+    gameState.speed++;
+    gameState.intervalid = window.setInterval(startGameLoop, gameState.speed * 20);
+  });
+}
+
